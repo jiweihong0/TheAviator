@@ -559,13 +559,23 @@ Cloud.prototype.rotate = function(){
   }
 }
 
+let font;
+
+var loader = new THREE.FontLoader();
+loader.load('../fonts/codropsicons/helvetiker_regular.typeface.js', function (res) {
+  font = res;
+});
+  
+
 Ennemy = function(){
-  var geom = new THREE.TetrahedronGeometry(8,2);
-  var mat = new THREE.MeshPhongMaterial({
+
+  var geom = new THREE.TextGeometry("hello",{
+    size: 10,
+    font: font,
+  })
+  var mat = new THREE.MeshBasicMaterial({
     color:Colors.red,
-    shininess:0,
-    specular:0xffffff,
-    shading:THREE.FlatShading
+    // shading:THREE.FlatShading
   });
   this.mesh = new THREE.Mesh(geom,mat);
   this.mesh.castShadow = true;
