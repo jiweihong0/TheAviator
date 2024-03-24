@@ -48,7 +48,7 @@ function resetGame(){
           planeRotZSensivity:0.0004,
           planeFallSpeed:.001,
           planeMinSpeed:1.2,
-          planeMaxSpeed:1.3,
+          planeMaxSpeed:1.2,
           planeSpeed:0,
           planeCollisionDisplacementX:0,
           planeCollisionSpeedX:0,
@@ -59,8 +59,8 @@ function resetGame(){
           seaRadius:600,
           seaLength:800,
           //seaRotationSpeed:0.006,
-          wavesMinAmp : 5,
-          wavesMaxAmp : 20,
+          wavesMinAmp : 1,
+          wavesMaxAmp : 2,
           wavesMinSpeed : 0.001,
           wavesMaxSpeed : 0.003,
 
@@ -70,13 +70,13 @@ function resetGame(){
 
           coinDistanceTolerance:15,
           coinValue:3,
-          coinsSpeed:.5,
+          coinsSpeed:0.2,
           coinLastSpawn:0,
           distanceForCoinsSpawn:100,
 
           ennemyDistanceTolerance:10,
           ennemyValue:10,
-          ennemiesSpeed:.6,
+          ennemiesSpeed:.3,
           ennemyLastSpawn:0,
           distanceForEnnemiesSpawn:50,
 
@@ -180,6 +180,16 @@ function handleTouchEnd(event){
     hideReplay();
   }
 }
+
+
+// font loader
+let font;
+
+var loader = new THREE.FontLoader();
+
+loader.load('../fonts/codropsicons/helvetiker_regular.typeface.js', function (res) {
+  font = res;
+});
 
 // LIGHTS
 
@@ -473,7 +483,7 @@ Sky.prototype.moveClouds = function(){
     var c = this.clouds[i];
     c.rotate();
   }
-  this.mesh.rotation.z += game.speed*deltaTime;
+  this.mesh.rotation.z += 0.0005;
 
 }
 
@@ -564,7 +574,7 @@ Cloud.prototype.rotate = function(){
 
 Ennemy = function(){
 
-  var geom = new THREE.TextGeometry("hello world",{
+  var geom = new THREE.TextGeometry("早安",{
     size: 10,
     font: font,
     height: 2,
@@ -618,10 +628,34 @@ EnnemiesHolder.prototype.rotateEnnemies = function(){
     ennemy.mesh.rotation.y =0;
 
     //var globalEnnemyPosition =  ennemy.mesh.localToWorld(new THREE.Vector3());
-    var diffPos = airplane.mesh.position.clone().sub(ennemy.mesh.position.clone());
+
+    var getsize = ennemy.mesh.geometry?.boundingSphere?.center;
+    if (getsize === undefined) {
+      continue
+    }
+    
+    // var getsize = ennemy.mesh.geometry.center() ;
+    var getpos = ennemy.mesh.position.clone();
+
+    const newSize = {...getpos, x: getpos.x + getsize.x, y: getpos.y + getsize.y};
+
+    var diffPos = airplane.mesh.position.clone().sub(newSize);
     var d = diffPos.length();
-    if (d<game.ennemyDistanceTolerance){
+    // 與自中心距離
+    if (d<25){
+      
       particlesHolder.spawnParticles(ennemy.mesh.position.clone(), 15, Colors.red, 3);
+      ennemiesPool.unshift(this.ennemiesInUse.splice(i,1)[0]);
+      this.mesh.remove(ennemy.mesh);
+      game.planeCollisionSpeedX = 100 * diffPos.x / d;
+      game.planeCollisionSpeedY = 100 * diffPos.y / d;
+      ambientLight.intensity = 2;
+
+      removeEnergy();
+      i--;
+    }
+    else if (d<15){
+      particlesHolder.spawnParticles(ennemy.mesh.position.clone(), 15, Colors.red, 4);
 
       ennemiesPool.unshift(this.ennemiesInUse.splice(i,1)[0]);
       this.mesh.remove(ennemy.mesh);
@@ -631,7 +665,9 @@ EnnemiesHolder.prototype.rotateEnnemies = function(){
 
       removeEnergy();
       i--;
-    }else if (ennemy.angle > Math.PI){
+    }
+
+    else if (ennemy.angle > Math.PI){
       ennemiesPool.unshift(this.ennemiesInUse.splice(i,1)[0]);
       this.mesh.remove(ennemy.mesh);
       i--;
@@ -761,8 +797,15 @@ CoinsHolder.prototype.rotateCoins = function(){
     coin.mesh.rotation.z =0;
     coin.mesh.rotation.y =0;
 
+    var coinsize = coin.mesh.geometry?.boundingSphere?.center;
+    if (coinsize === undefined) {
+      continue
+    }
+    var coinpos = coin.mesh.position.clone();
+
+    var newsize = {...coinpos, x: coinpos.x + coinsize.x, y: coinpos.y + coinsize.y};
     //var globalCoinPosition =  coin.mesh.localToWorld(new THREE.Vector3());
-    var diffPos = airplane.mesh.position.clone().sub(coin.mesh.position.clone());
+    var diffPos = airplane.mesh.position.clone().sub(newsize);
     var d = diffPos.length();
     if (d<game.coinDistanceTolerance){
       this.coinsPool.unshift(this.coinsInUse.splice(i,1)[0]);
