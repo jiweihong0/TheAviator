@@ -183,13 +183,9 @@ function handleTouchEnd(event){
 
 
 // font loader
+
 let font;
-
 var loader = new THREE.FontLoader();
-
-loader.load('../fonts/codropsicons/helvetiker_regular.typeface.js', function (res) {
-  font = res;
-});
 
 // LIGHTS
 
@@ -1037,30 +1033,33 @@ var fieldDistance, energyBar, replayMessage, fieldLevel, levelCircle;
 function init(event){
 
   // UI
+  loader.load("../fonts/codropsicons/Microsoft YaHei_Regular.js", function (res) {
+    font = res;
 
-  fieldDistance = document.getElementById("distValue");
-  energyBar = document.getElementById("energyBar");
-  replayMessage = document.getElementById("replayMessage");
-  fieldLevel = document.getElementById("levelValue");
-  levelCircle = document.getElementById("levelCircleStroke");
+    fieldDistance = document.getElementById("distValue");
+    energyBar = document.getElementById("energyBar");
+    replayMessage = document.getElementById("replayMessage");
+    fieldLevel = document.getElementById("levelValue");
+    levelCircle = document.getElementById("levelCircleStroke");
 
-  resetGame();
-  createScene();
+    resetGame();
+    createScene();
 
-  createLights();
-  createPlane();
-  createSea();
-  createSky();
-  createCoins();
-  createEnnemies();
-  createParticles();
+    createLights();
+    createPlane();
+    createSea();
+    createSky();
+    createCoins();
+    createEnnemies();
+    createParticles();
 
-  document.addEventListener('mousemove', handleMouseMove, false);
-  document.addEventListener('touchmove', handleTouchMove, false);
-  document.addEventListener('mouseup', handleMouseUp, false);
-  document.addEventListener('touchend', handleTouchEnd, false);
+    document.addEventListener('mousemove', handleMouseMove, false);
+    document.addEventListener('touchmove', handleTouchMove, false);
+    document.addEventListener('mouseup', handleMouseUp, false);
+    document.addEventListener('touchend', handleTouchEnd, false);
 
-  loop();
+    loop();
+  })
 }
 
 window.addEventListener('load', init, false);
