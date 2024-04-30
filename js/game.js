@@ -803,7 +803,7 @@ CoinsHolder.prototype.rotateCoins = function(){
     //var globalCoinPosition =  coin.mesh.localToWorld(new THREE.Vector3());
     var diffPos = airplane.mesh.position.clone().sub(newsize);
     var d = diffPos.length();
-    if (d<game.coinDistanceTolerance){
+    if (d<25){
       this.coinsPool.unshift(this.coinsInUse.splice(i,1)[0]);
       this.mesh.remove(coin.mesh);
       particlesHolder.spawnParticles(coin.mesh.position.clone(), 5, 0x009999, .8);
