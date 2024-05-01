@@ -183,8 +183,6 @@ var airplane;
 function createPlane(){
   airplane = new AirPlane();
   
-  
-  
   scene.add(airplane.mesh);
 }
 
