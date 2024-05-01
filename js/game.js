@@ -7,7 +7,7 @@ var Colors = {
     pink:0xF5986E,
     yellow:0xf4ce93,
     blue:0x68c3c0,
-
+    gray:0x7b7b7b,
 };
 
 ///////////////
@@ -281,55 +281,52 @@ Sky.prototype.moveClouds = function(){
 }
 
 Sea = function(){
-  var geom = new THREE.CylinderGeometry(game.seaRadius,game.seaRadius,game.seaLength,40,10);
-  geom.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI/2));
-  geom.mergeVertices();
-  var l = geom.vertices.length;
+  // load gltf
+  this.mesh = new THREE.Object3D();
+  var loader = new THREE.GLTFLoader();
+  var self = this;
+  loader.load(
+    '../models/earth/scene.gltf', // replace with the path to your model
+    function ( gltf ) {
+      var model = gltf.scene;
+      model.scale.set(7,7,7);
+      // model.position.y = -600;
+      // model.rotation.y = Math.PI/2;
+      model.castShadow = true;
+      model.receiveShadow = true;
+      self.mesh.add( model ); // Change this line
+    },
+    function ( xhr ) {
+      console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    },
+    function ( error ) {
+      console.log( 'An error happened' );
+    }
+  );
 
-  this.waves = [];
+  
 
-  for (var i=0;i<l;i++){
-    var v = geom.vertices[i];
-    //v.y = Math.random()*30;
-    this.waves.push({y:v.y,
-                     x:v.x,
-                     z:v.z,
-                     ang:Math.random()*Math.PI*2,
-                     amp:game.wavesMinAmp + Math.random()*(game.wavesMaxAmp-game.wavesMinAmp),
-                     speed:game.wavesMinSpeed + Math.random()*(game.wavesMaxSpeed - game.wavesMinSpeed)
-                    });
-  };
-  var mat = new THREE.MeshPhongMaterial({
-    color:Colors.blue,
-    transparent:true,
-    opacity:.8,
-    shading:THREE.FlatShading,
-
-  });
-
-  this.mesh = new THREE.Mesh(geom, mat);
-  this.mesh.name = "waves";
-  this.mesh.receiveShadow = true;
 
 }
 
-Sea.prototype.moveWaves = function (){
-  var verts = this.mesh.geometry.vertices;
-  var l = verts.length;
-  for (var i=0; i<l; i++){
-    var v = verts[i];
-    var vprops = this.waves[i];
-    v.x =  vprops.x + Math.cos(vprops.ang)*vprops.amp;
-    v.y = vprops.y + Math.sin(vprops.ang)*vprops.amp;
-    vprops.ang += vprops.speed*deltaTime;
-    this.mesh.geometry.verticesNeedUpdate=true;
-  }
-}
+// Sea.prototype.moveWaves = function (){
+//   var verts = this.mesh.geometry.vertices;
+//   var l = verts.length;
+//   for (var i=0; i<l; i++){
+//     var v = verts[i];
+//     var vprops = this.waves[i];
+//     v.x =  vprops.x + Math.cos(vprops.ang)*vprops.amp;
+//     v.y = vprops.y + Math.sin(vprops.ang)*vprops.amp;
+//     vprops.ang += vprops.speed*deltaTime;
+//     this.mesh.geometry.verticesNeedUpdate=true;
+//   }
+// }
 
 Cloud = function(){
   this.mesh = new THREE.Object3D();
   this.mesh.name = "cloud";
-  var geom = new THREE.CubeGeometry(20,20,20);
+  // 生成雲朵 圓形
+  var geom = new THREE.SphereGeometry(20, 20, 20);
   var mat = new THREE.MeshPhongMaterial({
     color:Colors.white,
 
@@ -366,8 +363,9 @@ Cloud.prototype.rotate = function(){
 
 
 Ennemy = function(){
+  let bad_enivorment_word_array = ['核廢料','免洗餐具']
 
-  var geom = new THREE.TextGeometry("早安",{
+  var geom = new THREE.TextGeometry(bad_enivorment_word_array[Math.floor(Math.random() * bad_enivorment_word_array.length)],{
     size: 10,
     font: font,
     height: 2,
@@ -522,10 +520,12 @@ ParticlesHolder.prototype.spawnParticles = function(pos, density, color, scale){
 }
 
 Coin = function(){
-  var geom = new THREE.TextGeometry("good",{
+  let good_enivorment_word_array = ['環保袋','環保吸管','環保餐具']
+
+  var geom = new THREE.TextGeometry(good_enivorment_word_array[Math.floor(Math.random() * good_enivorment_word_array.length)],{
     size: 10,
     font: font,
-    height: 2,
+    height: 3,
   })
   var mat = new THREE.MeshBasicMaterial({
     color:Colors.red,
@@ -733,7 +733,7 @@ function loop(){
   ennemiesHolder.rotateEnnemies();
 
   sky.moveClouds();
-  sea.moveWaves();
+  // sea.moveWaves();
   
   
   if (mixer) mixer.update(clock.getDelta()); //
@@ -755,7 +755,7 @@ function updateEnergy(){
   game.energy -= game.speed*deltaTime*game.ratioSpeedEnergy;
   game.energy = Math.max(0, game.energy);
   energyBar.style.right = (100-game.energy)+"%";
-  energyBar.style.backgroundColor = (game.energy<50)? "#f25346" : "#68c3c0";
+  energyBar.style.backgroundColor = (game.energy<50)? "#00ff00" : "#00ff00";
 
   if (game.energy<30){
     energyBar.style.animationName = "blinking";
