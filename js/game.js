@@ -289,7 +289,7 @@ Sea = function(){
     '../models/earth/scene.gltf', // replace with the path to your model
     function ( gltf ) {
       var model = gltf.scene;
-      model.scale.set(7,7,7);
+      model.scale.set(6.2,6.2,6.2);
       // model.position.y = -600;
       // model.rotation.y = Math.PI/2;
       model.castShadow = true;
@@ -621,7 +621,7 @@ var airplane;
 
 function createPlane(){
   airplane = new AirPlane();
-  airplane.mesh.scale.set(.6,.6,.6);
+  // airplane.mesh.scale.set(.6,.6,.6);
   airplane.mesh.position.y = game.planeDefaultHeight;
   scene.add(airplane.mesh);
 }
