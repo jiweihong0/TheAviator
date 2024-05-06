@@ -432,8 +432,11 @@ EnnemiesHolder.prototype.rotateEnnemies = function(){
 
     var diffPos = airplane.mesh.position.clone().sub(newSize);
     var d = diffPos.length();
-    // 與自中心距離
-    if (d<25){
+    var ennemyBox = new THREE.Box3().setFromObject(ennemy.mesh)
+    var airplaneBox = new THREE.Box3().setFromObject(airplane.mesh);
+
+    if (ennemyBox.intersectsBox(airplaneBox)) {
+ 
       
       particlesHolder.spawnParticles(ennemy.mesh.position.clone(), 15, Colors.red, 3);
       ennemiesPool.unshift(this.ennemiesInUse.splice(i,1)[0]);
@@ -445,19 +448,7 @@ EnnemiesHolder.prototype.rotateEnnemies = function(){
       removeEnergy();
       i--;
     }
-    else if (d<15){
-      particlesHolder.spawnParticles(ennemy.mesh.position.clone(), 15, Colors.red, 4);
-
-      ennemiesPool.unshift(this.ennemiesInUse.splice(i,1)[0]);
-      this.mesh.remove(ennemy.mesh);
-      game.planeCollisionSpeedX = 100 * diffPos.x / d;
-      game.planeCollisionSpeedY = 100 * diffPos.y / d;
-      ambientLight.intensity = 2;
-
-      removeEnergy();
-      i--;
-    }
-
+ 
     else if (ennemy.angle > Math.PI){
       ennemiesPool.unshift(this.ennemiesInUse.splice(i,1)[0]);
       this.mesh.remove(ennemy.mesh);
@@ -600,13 +591,17 @@ CoinsHolder.prototype.rotateCoins = function(){
     //var globalCoinPosition =  coin.mesh.localToWorld(new THREE.Vector3());
     var diffPos = airplane.mesh.position.clone().sub(newsize);
     var d = diffPos.length();
-    if (d<25){
+    var coinBox = new THREE.Box3().setFromObject(coin.mesh);
+    var airplaneBox = new THREE.Box3().setFromObject(airplane.mesh);
+
+    if (coinBox.intersectsBox(airplaneBox)) {
       this.coinsPool.unshift(this.coinsInUse.splice(i,1)[0]);
       this.mesh.remove(coin.mesh);
       particlesHolder.spawnParticles(coin.mesh.position.clone(), 5, 0x009999, .8);
       addEnergy();
       i--;
-    }else if (coin.angle > Math.PI){
+    }
+   else if (coin.angle > Math.PI){
       this.coinsPool.unshift(this.coinsInUse.splice(i,1)[0]);
       this.mesh.remove(coin.mesh);
       i--;
