@@ -15,11 +15,13 @@
 
 .header {
 	position: absolute;
-	top: 8vh;
+	top: 5vh;
 	left: 0;
 	width: 100%;
-	text-align: center;
+	text-align: left;
 	pointer-events: none;
+	display: flex;
+	flex-direction: row;
 }
 
 .header h1 {
@@ -29,6 +31,7 @@
 	margin: 0;
 	letter-spacing: -0.025em;
 	color: #d1b790;
+	white-space: nowrap;
 }
 
 .header h1 span {
@@ -52,7 +55,7 @@
 .score {
 	width: 100%;
 	margin: 2em 0 0;
-	text-align: center;
+	text-align: right;
 	white-space: nowrap;
 }
 
@@ -144,6 +147,26 @@
 	letter-spacing: 0.5em;
 	color: #d1b790;
 }
+
+.learnwords {
+	font-weight: bold;
+	position: absolute;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	text-transform: uppercase;
+	pointer-events: none;
+}
+
+.learnwords--replay {
+	font-size: 1.25vw;
+	bottom: 50vh;
+	display: none;
+	text-indent: 0.5em;
+	letter-spacing: 0.5em;
+	color: #00c000;
+}
+
 
 .message--instructions {
 	font-family: 'Playfair Display';

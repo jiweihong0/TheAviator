@@ -41,7 +41,7 @@ function resetGame(){
           distanceForLevelUpdate:1000,
 
           planeDefaultHeight:100,
-          planeAmpHeight:80,
+          planeAmpHeight:110,
           planeAmpWidth:75,
           planeMoveSensivity:0.005,
           planeRotXSensivity:0.0008,
@@ -79,10 +79,12 @@ function resetGame(){
           ennemiesSpeed:.3,
           ennemyLastSpawn:0,
           distanceForEnnemiesSpawn:50,
+          
+          learnword:[],
 
           status : "playing",
          };
-  fieldLevel.innerHTML = Math.floor(game.level);
+  // fieldLevel.innerHTML = Math.floor(game.level);
 }
   
 
@@ -511,13 +513,23 @@ ParticlesHolder.prototype.spawnParticles = function(pos, density, color, scale){
 }
 
 Coin = function(){
-  let good_enivorment_word_array = ['環保袋','環保吸管','環保餐具']
+  //每個詞只會出現一次， 用過的詞會被刪除
+  let good_enivorment_word_array = ['環保袋','環保吸管','環保餐具','環保水壺','環保杯','環保筷','環保餐盒','環保餐具','環保餐盤']
+  let word = good_enivorment_word_array[Math.floor(Math.random() * good_enivorment_word_array.length)];
+  // 如果詞庫用完，就不會再出現
+  if (good_enivorment_word_array.length === 0) {
+    word = '環保';
+  }
 
-  var geom = new THREE.TextGeometry(good_enivorment_word_array[Math.floor(Math.random() * good_enivorment_word_array.length)],{
+  console.log(word);
+
+  var geom = new THREE.TextGeometry(word, {
     size: 10,
     font: font,
-    height: 3,
-  })
+    height: 2,
+  });
+    
+
   var mat = new THREE.MeshBasicMaterial({
     color:Colors.red,
     // shading:THREE.FlatShading
@@ -600,6 +612,8 @@ CoinsHolder.prototype.rotateCoins = function(){
       particlesHolder.spawnParticles(coin.mesh.position.clone(), 5, 0x009999, .8);
       addEnergy();
       i--;
+      // put learn words
+      game.learnword.push(coin.mesh.geometry.parameters.text);
     }
    else if (coin.angle > Math.PI){
       this.coinsPool.unshift(this.coinsInUse.splice(i,1)[0]);
@@ -687,7 +701,7 @@ function loop(){
     if (Math.floor(game.distance)%game.distanceForLevelUpdate == 0 && Math.floor(game.distance) > game.levelLastUpdate){
       game.levelLastUpdate = Math.floor(game.distance);
       game.level++;
-      fieldLevel.innerHTML = Math.floor(game.level);
+      // fieldLevel.innerHTML = Math.floor(game.level);
 
       game.targetBaseSpeed = game.initSpeed + game.incrementSpeedByLevel*game.level
     }
@@ -740,7 +754,7 @@ function updateDistance(){
   game.distance += game.speed*deltaTime*game.ratioSpeedDistance;
   fieldDistance.innerHTML = Math.floor(game.distance);
   var d = 502*(1-(game.distance%game.distanceForLevelUpdate)/game.distanceForLevelUpdate);
-  levelCircle.setAttribute("stroke-dashoffset", d);
+  // levelCircle.setAttribute("stroke-dashoffset", d);
 
 }
 
@@ -793,7 +807,7 @@ function updatePlane(){
 
   airplane.mesh.rotation.z = (targetY-airplane.mesh.position.y)*deltaTime*game.planeRotXSensivity;
   airplane.mesh.rotation.x = (airplane.mesh.position.y-targetY)*deltaTime*game.planeRotZSensivity;
-  var targetCameraZ = normalize(game.planeSpeed, game.planeMinSpeed, game.planeMaxSpeed, game.cameraNearPos, game.cameraFarPos);
+  // var targetCameraZ = normalize(game.planeSpeed, game.planeMinSpeed, game.planeMaxSpeed, game.cameraNearPos, game.cameraFarPos);
   camera.fov = normalize(mousePos.x,-1,1,40, 80);
   camera.updateProjectionMatrix ()
   camera.position.y += (airplane.mesh.position.y - camera.position.y)*deltaTime*game.cameraSensivity;
@@ -807,10 +821,16 @@ function updatePlane(){
 }
 
 function showReplay(){
+  // inner html put game learn words
+  learnword.innerHTML = game.learnword;
+  learnword.style.display="block";
   replayMessage.style.display="block";
 }
 
 function hideReplay(){
+
+  learnword.message = 'none';
+  learnword.style.display="none";
   replayMessage.style.display="none";
 }
 
@@ -823,7 +843,7 @@ function normalize(v,vmin,vmax,tmin, tmax){
   return tv;
 }
 
-var fieldDistance, energyBar, replayMessage, fieldLevel, levelCircle;
+var fieldDistance, energyBar, replayMessage, fieldLevel, levelCircle, learnword;
 
 function init(event){
 
@@ -836,6 +856,7 @@ function init(event){
     replayMessage = document.getElementById("replayMessage");
     fieldLevel = document.getElementById("levelValue");
     levelCircle = document.getElementById("levelCircleStroke");
+    learnword = document.getElementById("learnwords");
 
     resetGame();
     createScene();
